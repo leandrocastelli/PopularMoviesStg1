@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Popular Movies Stg1</string>
+    <string name="settings">Settings</string>
+    <string name="top_rated">Top Rated</string>
+    <string name="popular">Popular</string>
+    <string name="slash_10">"/10"</string>
+</resources>
