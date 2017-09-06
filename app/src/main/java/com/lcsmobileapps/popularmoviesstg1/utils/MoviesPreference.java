@@ -14,6 +14,7 @@ public class MoviesPreference {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         return sharedPreferences.getString(Constants.MOVIE_PREFERENCE, Constants.TOP_RATED);
     }
+
     public static void setMoviePreference(Context context, String value) {
         SharedPreferences.Editor sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
                 .edit();

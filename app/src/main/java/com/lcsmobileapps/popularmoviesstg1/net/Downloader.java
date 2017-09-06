@@ -7,7 +7,6 @@ import android.widget.ProgressBar;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-import com.lcsmobileapps.popularmoviesstg1.adapter.MoviesAdapter;
 import com.lcsmobileapps.popularmoviesstg1.model.Movie;
 import com.lcsmobileapps.popularmoviesstg1.utils.Utils;
 
@@ -30,9 +29,9 @@ import java.util.Scanner;
 
 public class Downloader extends AsyncTask<String, Void, List<Movie>>{
 
-    final private MoviesAdapter adapter;
+    final private IDataReady adapter;
     final private ProgressBar progressBar;
-    public Downloader(MoviesAdapter adapter, ProgressBar progressBar) {
+    public Downloader(IDataReady adapter, ProgressBar progressBar) {
         this.adapter = adapter;
         this.progressBar = progressBar;
     }
@@ -41,6 +40,9 @@ public class Downloader extends AsyncTask<String, Void, List<Movie>>{
     protected List<Movie> doInBackground(String... params) {
 
         String json = getJson(Utils.buildURL(params[0]));
+        if (json == null) {
+            return null;
+        }
         JSONArray results;
         try {
             JSONObject jsonObject = new JSONObject(json);
@@ -67,7 +69,7 @@ public class Downloader extends AsyncTask<String, Void, List<Movie>>{
         progressBar.setVisibility(View.INVISIBLE);
         if (adapter != null) {
             //Update List
-            adapter.setMoviesData(movies);
+            adapter.onDataReady(movies);
         }
 
     }
@@ -79,6 +81,7 @@ public class Downloader extends AsyncTask<String, Void, List<Movie>>{
         HttpURLConnection connection = null;
         try{
             connection = (HttpURLConnection)url.openConnection();
+            connection.setReadTimeout(10000);
             InputStream inputStream = connection.getInputStream();
 
             Scanner scanner = new Scanner(inputStream);

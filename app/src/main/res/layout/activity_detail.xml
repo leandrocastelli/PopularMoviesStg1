@@ -3,48 +3,22 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:showIn="@layout/activity_detail_customized">
     <RelativeLayout
 
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         tools:context="com.lcsmobileapps.popularmoviesstg1.DetailActivity">
-        <android.support.v7.widget.CardView
-            android:id="@+id/cv_detail"
-            android:layout_width="match_parent"
-            android:layout_height="112dp"
-            app:cardBackgroundColor="#00bfa5"
-            >
-            <TextView
-                android:id="@+id/tv_title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textStyle="bold"
-                android:textAppearance="?android:textAppearanceLarge"
-                android:textColor="@android:color/white"
-                android:layout_marginStart="16dp"
-                android:layout_gravity="center_vertical"
-                />
 
-        </android.support.v7.widget.CardView>
 
-        <ImageView
-            android:id="@+id/iv_poster_detail"
-            android:scaleType="fitXY"
-            android:layout_width="170dp"
-            android:layout_height="250dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginLeft="16dp"
-            android:layout_marginRight="16dp"
-            android:layout_below="@id/cv_detail"/>
+
         <TextView
             android:id="@+id/tv_detail_date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-
-            android:layout_below="@id/cv_detail"
-            android:layout_toEndOf="@id/iv_poster_detail"
-            android:layout_marginStart="8dp"
+            android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
             android:textAppearance="?android:textAppearanceMedium"
             android:textStyle="bold"/>
@@ -53,20 +27,17 @@
             android:id="@+id/tv_rate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-
             android:layout_below="@id/tv_detail_date"
-            android:layout_toEndOf="@id/iv_poster_detail"
             android:textAppearance="?android:textAppearanceMedium"
-            android:layout_marginStart="8dp"/>
+            android:layout_marginStart="16dp"/>
 
         <TextView
             android:id="@+id/tv_detail_description"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-
-            android:layout_below="@id/iv_poster_detail"
-            android:layout_marginRight="16dp"
-            android:layout_marginLeft="16dp"/>
+            android:layout_below="@id/tv_rate"
+            android:layout_marginEnd="16dp"
+            android:layout_marginStart="16dp"/>
 
     </RelativeLayout>
 </ScrollView>

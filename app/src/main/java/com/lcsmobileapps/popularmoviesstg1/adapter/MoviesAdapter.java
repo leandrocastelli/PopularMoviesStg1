@@ -12,6 +12,7 @@ import android.widget.ImageView;
 import com.lcsmobileapps.popularmoviesstg1.DetailActivity;
 import com.lcsmobileapps.popularmoviesstg1.R;
 import com.lcsmobileapps.popularmoviesstg1.model.Movie;
+import com.lcsmobileapps.popularmoviesstg1.net.IDataReady;
 import com.lcsmobileapps.popularmoviesstg1.utils.Constants;
 import com.squareup.picasso.Picasso;
 
@@ -24,7 +25,7 @@ import java.util.List;
  * Created by leandro.silverio on 24/08/2017.
  */
 
-public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieHolder> {
+public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieHolder> implements IDataReady {
 
     public void setMoviesData(List<Movie> moviesData) {
         this.moviesData = moviesData;
@@ -67,6 +68,12 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieHolde
             return moviesData.size();
         }
         return 0;
+    }
+
+    @Override
+    public void onDataReady(List<Movie> moviesData) {
+        this.moviesData = moviesData;
+        notifyDataSetChanged();
     }
 
     class MovieHolder extends RecyclerView.ViewHolder {
