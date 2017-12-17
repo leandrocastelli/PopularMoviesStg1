@@ -2,6 +2,7 @@ package com.lcsmobileapps.popularmoviesstg1.adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -11,6 +12,7 @@ import android.widget.ImageView;
 
 import com.lcsmobileapps.popularmoviesstg1.DetailActivity;
 import com.lcsmobileapps.popularmoviesstg1.R;
+import com.lcsmobileapps.popularmoviesstg1.database.MoviesContract;
 import com.lcsmobileapps.popularmoviesstg1.model.Movie;
 import com.lcsmobileapps.popularmoviesstg1.net.IDataReady;
 import com.lcsmobileapps.popularmoviesstg1.utils.Constants;
@@ -27,15 +29,7 @@ import java.util.List;
 
 public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieHolder> implements IDataReady {
 
-    public void setMoviesData(List<Movie> moviesData) {
-        this.moviesData = moviesData;
-        notifyDataSetChanged();
-    }
-    public List<Movie> getMoviesData() {
-        return moviesData;
-    }
-
-    private List<Movie> moviesData;
+    private Cursor mCursor;
     @Override
     public MovieHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         Context ctx = parent.getContext();
@@ -48,15 +42,23 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieHolde
 
     @Override
     public void onBindViewHolder(MovieHolder holder, int position) {
-        final Movie movie = moviesData.get(position);
-        Picasso.with(holder.posterImg.getContext()).load(Constants.URL_IMAGE_BASE + movie.getPoster_path())
+        int posterIndex = mCursor.getColumnIndex(MoviesContract.MoviesEntry.COLUMN_POSTER);
+        int idIndex = mCursor.getColumnIndex(MoviesContract.MoviesEntry._ID);
+
+        mCursor.moveToPosition(position);
+
+        String posterPath = mCursor.getString(posterIndex);
+        final int id = mCursor.getInt(idIndex);
+
+        Picasso.with(holder.posterImg.getContext()).load(Constants.URL_IMAGE_BASE + posterPath)
                 .into(holder.posterImg);
         holder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(v.getContext(), DetailActivity.class);
-                intent.putExtra(Constants.EXTRA_MOVIE, Parcels.wrap(movie));
+                intent.putExtra(Constants.EXTRA_MOVIE, id);
                 v.getContext().startActivity(intent);
+                mCursor.close();
             }
         });
     }
@@ -64,17 +66,12 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieHolde
 
     @Override
     public int getItemCount() {
-        if (moviesData != null) {
-            return moviesData.size();
+        if (mCursor != null) {
+            return mCursor.getCount();
         }
         return 0;
     }
 
-    @Override
-    public void onDataReady(List<Movie> moviesData) {
-        this.moviesData = moviesData;
-        notifyDataSetChanged();
-    }
 
     class MovieHolder extends RecyclerView.ViewHolder {
 
@@ -86,5 +83,11 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieHolde
             cardView = (CardView)itemView.findViewById(R.id.cv_poster_holder);
 
         }
+    }
+    @Override
+    public void swapCursor(Cursor newCursor) {
+        mCursor = newCursor;
+        // After the new Cursor is set, call notifyDataSetChanged
+        notifyDataSetChanged();
     }
 }

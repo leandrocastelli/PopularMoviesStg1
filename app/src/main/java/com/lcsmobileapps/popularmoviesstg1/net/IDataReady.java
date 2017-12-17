@@ -1,5 +1,7 @@
 package com.lcsmobileapps.popularmoviesstg1.net;
 
+import android.database.Cursor;
+
 import com.lcsmobileapps.popularmoviesstg1.model.Movie;
 
 import java.util.List;
@@ -9,5 +11,5 @@ import java.util.List;
  */
 
 public interface IDataReady {
-    void onDataReady(List<Movie> moviesData);
+    void swapCursor(Cursor cursor);
 }

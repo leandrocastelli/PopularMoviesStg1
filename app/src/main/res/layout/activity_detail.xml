@@ -13,7 +13,14 @@
         tools:context="com.lcsmobileapps.popularmoviesstg1.DetailActivity">
 
 
-
+        <ImageView
+            android:id="@+id/iv_favorite"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@android:drawable/btn_star_big_off"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:layout_margin="10dp"/>
         <TextView
             android:id="@+id/tv_detail_date"
             android:layout_width="wrap_content"

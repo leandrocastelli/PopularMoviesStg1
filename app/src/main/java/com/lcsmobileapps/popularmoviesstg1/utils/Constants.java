@@ -9,6 +9,9 @@ public class Constants {
     public static final String URL_IMAGE_BASE = "http://image.tmdb.org/t/p/w185/";
     public static final String TOP_RATED = "top_rated";
     public static final String POPULAR = "popular";
+    public static final String VIDEOS = "videos";
+    public static final String FAVORITE = "favorite";
+    public static final String REVIEWS = "reviews";
     public static final String URL_API = "api_key";
     public static final String MOVIE_PREFERENCE = "movies";
     public static final String KEY_DATASET = "dataset";

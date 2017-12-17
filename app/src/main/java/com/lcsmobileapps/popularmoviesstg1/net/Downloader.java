@@ -1,5 +1,7 @@
 package com.lcsmobileapps.popularmoviesstg1.net;
 
+import android.content.ContentValues;
+import android.content.Context;
 import android.os.AsyncTask;
 import android.view.View;
 import android.widget.ProgressBar;
@@ -7,7 +9,11 @@ import android.widget.ProgressBar;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import com.lcsmobileapps.popularmoviesstg1.database.MoviesContract;
 import com.lcsmobileapps.popularmoviesstg1.model.Movie;
+import com.lcsmobileapps.popularmoviesstg1.model.Review;
+import com.lcsmobileapps.popularmoviesstg1.model.Trailer;
+import com.lcsmobileapps.popularmoviesstg1.utils.Constants;
 import com.lcsmobileapps.popularmoviesstg1.utils.Utils;
 
 import org.json.JSONArray;
@@ -23,22 +29,23 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+import static com.lcsmobileapps.popularmoviesstg1.utils.Constants.FAVORITE;
+
 /**
  * Created by leandro.silverio on 24/08/2017.
  */
 
-public class Downloader extends AsyncTask<String, Void, List<Movie>>{
+public class Downloader extends AsyncTask<String, Void, Void>{
 
-    final private IDataReady adapter;
-    final private ProgressBar progressBar;
-    public Downloader(IDataReady adapter, ProgressBar progressBar) {
-        this.adapter = adapter;
-        this.progressBar = progressBar;
+    final private Context context;
+    public Downloader(Context context) {
+        this.context = context;
     }
 
     @Override
-    protected List<Movie> doInBackground(String... params) {
-
+    protected Void doInBackground(String... params) {
+        if (params[0] == FAVORITE)
+            return null;
         String json = getJson(Utils.buildURL(params[0]));
         if (json == null) {
             return null;
@@ -53,26 +60,54 @@ public class Downloader extends AsyncTask<String, Void, List<Movie>>{
         }
         Gson gson = new GsonBuilder().create();
         Type movieType = new TypeToken<ArrayList<Movie>>(){}.getType();
-        return  gson.fromJson(String.valueOf(results), movieType);
+        List<Movie> movieList = gson.fromJson(String.valueOf(results), movieType);
+        for (Movie movie : movieList) {
+            context.getContentResolver().insert(MoviesContract.MoviesEntry.CONTENT_URI,
+                    movie.toContentValues());
 
+            json = getJson(Utils.buildURL(movie.getId() + "/" + Constants.REVIEWS));
+            if (json != null) {
+                try {
+                    JSONObject jsonObject = new JSONObject(json);
+                    results = jsonObject.getJSONArray("results");
+                } catch (JSONException e) {
+                    //wrong json format.
+                    return null;
+                }
+                Type reviewsType = new TypeToken<ArrayList<Review>>(){}.getType();
+                List<Review> reviews = gson.fromJson(String.valueOf(results), reviewsType);
+                for (Review review : reviews) {
+                    context.getContentResolver().insert(MoviesContract.ReviewsEntry.CONTENT_URI,
+                            review.toContentValues(movie.getId()));
+                }
+            }
 
+            json = getJson(Utils.buildURL(movie.getId() + "/" + Constants.VIDEOS));
+            if (json != null) {
+                try {
+                    JSONObject jsonObject = new JSONObject(json);
+                    results = jsonObject.getJSONArray("results");
+                } catch (JSONException e) {
+                    //wrong json format.
+                    return null;
+                }
+                Type trailersType = new TypeToken<ArrayList<Trailer>>(){}.getType();
+                List<Trailer> trailers = gson.fromJson(String.valueOf(results), trailersType);
+                for (Trailer trailer : trailers) {
+                    context.getContentResolver().insert(MoviesContract.TrailersEntry.CONTENT_URI,
+                            trailer.toContentValues(movie.getId()));
+                }
+            }
+        }
+        return null;
     }
 
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-        progressBar.setVisibility(View.VISIBLE);
+       // progressBar.setVisibility(View.VISIBLE);
     }
 
-    @Override
-    protected void onPostExecute(List<Movie> movies) {
-        progressBar.setVisibility(View.INVISIBLE);
-        if (adapter != null) {
-            //Update List
-            adapter.onDataReady(movies);
-        }
-
-    }
 
     private String getJson(URL url){
 

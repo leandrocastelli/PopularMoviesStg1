@@ -1,7 +1,9 @@
 package com.lcsmobileapps.popularmoviesstg1;
 
 import android.content.DialogInterface;
+import android.support.v4.content.Loader;
 import android.content.res.Configuration;
+import android.database.Cursor;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -15,12 +17,17 @@ import android.widget.ProgressBar;
 import com.lcsmobileapps.popularmoviesstg1.adapter.MoviesAdapter;
 import com.lcsmobileapps.popularmoviesstg1.model.Movie;
 import com.lcsmobileapps.popularmoviesstg1.net.Downloader;
+import com.lcsmobileapps.popularmoviesstg1.net.IDataReady;
+import com.lcsmobileapps.popularmoviesstg1.net.MoviesLoader;
 import com.lcsmobileapps.popularmoviesstg1.utils.Constants;
 import com.lcsmobileapps.popularmoviesstg1.utils.MoviesPreference;
 
 import org.parceler.Parcels;
 
 import java.util.List;
+
+import static com.lcsmobileapps.popularmoviesstg1.net.MoviesLoader.LOAD_CATEGORY;
+import static com.lcsmobileapps.popularmoviesstg1.net.MoviesLoader.MOVIES_LOADER_ID;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -44,14 +51,7 @@ public class MainActivity extends AppCompatActivity {
         rv.setLayoutManager(gridLayoutManager);
         MoviesAdapter adapter = new MoviesAdapter();
         rv.setAdapter(adapter);
-        if (savedInstanceState != null) {
-            List<Movie> tempList = Parcels.unwrap(savedInstanceState.getParcelable(Constants.KEY_DATASET));
-            adapter.setMoviesData(tempList);
-        } else {
-            updateAdapter();
-        }
-
-
+        updateAdapter();
     }
 
     @Override
@@ -68,21 +68,40 @@ public class MainActivity extends AppCompatActivity {
             case R.id.menu_settings:
 
                 String preference = MoviesPreference.getMoviePreference(this);
-                int currentChecked = Constants.TOP_RATED.equals(preference)?0:1;
+                int currentChecked = 0;
+
+                switch ( preference) {
+                    case Constants.TOP_RATED: {
+                        currentChecked = 0;
+                    }break;
+                    case Constants.POPULAR: {
+                        currentChecked = 1;
+                    }break;
+                    case Constants.FAVORITE: {
+                        currentChecked = 2;
+                    }break;
+                }
 
                 final AlertDialog dialog = new AlertDialog.Builder(this).setTitle(R.string.settings)
-                        .setSingleChoiceItems(new CharSequence[]{getString(R.string.top_rated) , getString(R.string.popular)},
+                        .setSingleChoiceItems(new CharSequence[]{getString(R.string.top_rated) , getString(R.string.popular),
+                                getString(R.string.favorite)},
                                 currentChecked, new DialogInterface.OnClickListener() {
 
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
 
-                            if (which == 0) {
+                        switch (which) {
+                            case 0:
                                 MoviesPreference.setMoviePreference(MainActivity.this, Constants.TOP_RATED);
-                            } else {
+                                break;
+                            case 1:
                                 MoviesPreference.setMoviePreference(MainActivity.this, Constants.POPULAR);
-                            }
-                            updateAdapter();
+                                break;
+                            case 2:
+                                MoviesPreference.setMoviePreference(MainActivity.this, Constants.FAVORITE);
+                                break;
+                        }
+                        updateAdapter();
 
                         dialog.dismiss();
                     }
@@ -96,16 +115,19 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        MoviesAdapter adapter = (MoviesAdapter)rv.getAdapter();
-        List<Movie> movieArrayList = adapter.getMoviesData();
-        outState.putParcelable(Constants.KEY_DATASET, Parcels.wrap(movieArrayList));
         super.onSaveInstanceState(outState);
 
     }
 
     private void updateAdapter() {
         String preference = MoviesPreference.getMoviePreference(this);
-        new Downloader((MoviesAdapter) rv.getAdapter(), progressBar).execute(preference);
+        Bundle bundle = new Bundle();
+        bundle.putString(LOAD_CATEGORY, preference);
+        Loader<Cursor> loader = getSupportLoaderManager().getLoader(MoviesLoader.MOVIES_LOADER_ID);
+        if (loader == null)
+            getSupportLoaderManager().initLoader(MoviesLoader.MOVIES_LOADER_ID, bundle, new MoviesLoader((IDataReady)rv.getAdapter(), progressBar));
+        else
+            getSupportLoaderManager().restartLoader(MoviesLoader.MOVIES_LOADER_ID, bundle, new MoviesLoader((IDataReady)rv.getAdapter(), progressBar));
     }
 
 }
