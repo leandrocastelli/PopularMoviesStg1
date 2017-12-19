@@ -28,8 +28,7 @@ public class MoviesDbHelper extends SQLiteOpenHelper {
                 MoviesEntry.COLUMN_POSTER                + " TEXT NOT NULL, " +
                 MoviesEntry.COLUMN_OVERVIEW                + " TEXT NOT NULL, " +
                 MoviesEntry.COLUMN_VOTE                + " REAL , " +
-                MoviesEntry.COLUMN_RELEASE                + " TEXT NOT NULL, " +
-                MoviesEntry.COLUMN_FAVORITE                + " INTEGER); ";
+                MoviesEntry.COLUMN_RELEASE                + " TEXT NOT NULL); ";
 
         final String CREATE_REVIEWS_TABLE = "CREATE TABLE IF NOT EXISTS " + ReviewsEntry.TABLE_NAME + " (" +
                 ReviewsEntry._ID                + " TEXT PRIMARY KEY, " +
@@ -42,9 +41,14 @@ public class MoviesDbHelper extends SQLiteOpenHelper {
                 TrailersEntry.COLUMN_KEY                + " TEXT NOT NULL, " +
                 TrailersEntry.COLUMN_NAME                + " TEXT NOT NULL, " +
                 TrailersEntry.COLUMN_MOVIE_ID                + " INTEGER); ";
+
+        final String CREATE_FAVORITE_TABLE = "CREATE TABLE IF NOT EXISTS " + MoviesContract.FavoriteEntry.TABLE_NAME + " (" +
+                MoviesContract.FavoriteEntry._ID                + " TEXT PRIMARY KEY, " +
+                MoviesContract.FavoriteEntry.COLUMN_FAVORITE                + " INTEGER); ";
         db.execSQL(CREATE_MOVIES_TABLE);
         db.execSQL(CREATE_REVIEWS_TABLE);
         db.execSQL(CREATE_TRAILERS_TABLE);
+        db.execSQL(CREATE_FAVORITE_TABLE);
 
     }
 
@@ -53,6 +57,7 @@ public class MoviesDbHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + MoviesEntry.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + ReviewsEntry.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + TrailersEntry.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + MoviesContract.FavoriteEntry.TABLE_NAME);
         onCreate(db);
     }
 }

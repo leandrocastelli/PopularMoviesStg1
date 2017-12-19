@@ -1,6 +1,7 @@
 package com.lcsmobileapps.popularmoviesstg1.model;
 
 import android.content.ContentValues;
+import android.database.Cursor;
 
 
 import com.lcsmobileapps.popularmoviesstg1.database.MoviesContract;
@@ -56,6 +57,16 @@ public class Trailer {
         contentValues.put(MoviesContract.TrailersEntry.COLUMN_MOVIE_ID, movieID);
         return contentValues;
 
+    }
+
+    public Trailer (Cursor cursor) {
+        int idIndex = cursor.getColumnIndex(MoviesContract.TrailersEntry._ID);
+        int keyIndex = cursor.getColumnIndex(MoviesContract.TrailersEntry.COLUMN_KEY);
+        int nameIndex = cursor.getColumnIndex(MoviesContract.TrailersEntry.COLUMN_NAME);
+
+        this.id = String.valueOf(cursor.getInt(idIndex));
+        this.key = cursor.getString(keyIndex);
+        this.name = cursor.getString(nameIndex);
     }
 
 }

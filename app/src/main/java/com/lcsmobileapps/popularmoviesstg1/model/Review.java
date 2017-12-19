@@ -1,7 +1,9 @@
 package com.lcsmobileapps.popularmoviesstg1.model;
 
 import android.content.ContentValues;
+import android.database.Cursor;
 
+import com.lcsmobileapps.popularmoviesstg1.database.MoviesContract;
 import com.lcsmobileapps.popularmoviesstg1.database.MoviesContract.ReviewsEntry;
 /**
  * Created by Leandro on 12/16/2017.
@@ -51,5 +53,15 @@ public class Review {
         contentValues.put(ReviewsEntry.COLUMN_MOVIE_ID, movieID);
         return contentValues;
 
+    }
+
+    public Review (Cursor cursor) {
+        int idIndex = cursor.getColumnIndex(ReviewsEntry._ID);
+        int authorIndex = cursor.getColumnIndex(ReviewsEntry.COLUMN_AUTHOR);
+        int contentIndex = cursor.getColumnIndex(ReviewsEntry.COLUMN_CONTENT);
+
+        this.id = String.valueOf(cursor.getInt(idIndex));
+        this.author = cursor.getString(authorIndex);
+        this.content = cursor.getString(contentIndex);
     }
 }

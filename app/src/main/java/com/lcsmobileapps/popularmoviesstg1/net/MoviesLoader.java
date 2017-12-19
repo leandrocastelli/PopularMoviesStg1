@@ -12,20 +12,11 @@ import android.widget.ProgressBar;
 
 
 import com.lcsmobileapps.popularmoviesstg1.database.MoviesContract;
+import com.lcsmobileapps.popularmoviesstg1.database.MoviesContract.MoviesEntry;
+import com.lcsmobileapps.popularmoviesstg1.database.MoviesContract.FavoriteEntry;
+import com.lcsmobileapps.popularmoviesstg1.database.MoviesContract.ReviewsEntry;
+import com.lcsmobileapps.popularmoviesstg1.database.MoviesContract.TrailersEntry;
 
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.Type;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
 
 import static com.lcsmobileapps.popularmoviesstg1.utils.Constants.FAVORITE;
 import static com.lcsmobileapps.popularmoviesstg1.utils.Constants.POPULAR;
@@ -59,25 +50,27 @@ public class MoviesLoader implements LoaderManager.LoaderCallbacks<Cursor> {
         switch (category) {
             case  POPULAR: {
                 return new CursorLoader(context,
-                        MoviesContract.MoviesEntry.CONTENT_URI,
+                        MoviesEntry.CONTENT_URI,
                         null,
                         null,
                         null,
-                        MoviesContract.MoviesEntry.COLUMN_POPULARITY + " DESC");
+                        MoviesEntry.COLUMN_POPULARITY + " DESC LIMIT 10");
             }
             case TOP_RATED: {
                 return new CursorLoader(context,
-                        MoviesContract.MoviesEntry.CONTENT_URI,
+                        MoviesEntry.CONTENT_URI,
                         null,
                         null,
                         null,
-                        MoviesContract.MoviesEntry.COLUMN_VOTE + " DESC");
+                        MoviesEntry.COLUMN_VOTE + " DESC LIMIT 10");
             }
             case FAVORITE: {
+                String[] projection = { MoviesEntry.TABLE_NAME +"."+MoviesEntry._ID,
+                        MoviesEntry.TABLE_NAME +"."+MoviesEntry.COLUMN_POSTER};
                 return new CursorLoader(context,
-                        MoviesContract.MoviesEntry.CONTENT_URI,
+                        FavoriteEntry.CONTENT_URI,
+                        projection,
                         null,
-                        MoviesContract.MoviesEntry.COLUMN_FAVORITE + " = 1",
                         null,
                         null);
             }
@@ -94,7 +87,7 @@ public class MoviesLoader implements LoaderManager.LoaderCallbacks<Cursor> {
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         progressBar.setVisibility(View.INVISIBLE);
-        data.setNotificationUri(context.getContentResolver(), MoviesContract.MoviesEntry.CONTENT_URI);
+        data.setNotificationUri(context.getContentResolver(), MoviesEntry.CONTENT_URI);
         adapter.swapCursor(data);
     }
 

@@ -7,9 +7,12 @@ import android.content.Context;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+
+import static com.lcsmobileapps.popularmoviesstg1.database.MoviesDbHelper.DATABASE_NAME;
 
 /**
  * Created by Leandro on 12/16/2017.
@@ -23,6 +26,8 @@ public class MoviesProvider extends ContentProvider {
     public static final int REVIEW_WITH_ID = 201;
     public static final int TRAILERS = 300;
     public static final int TRAILER_WITH_ID = 301;
+    public static final int FAVORITES = 400;
+    public static final int FAVORITE_WITH_ID = 401;
 
     private static final UriMatcher sUriMatcher = buildUriMatcher();
 
@@ -37,6 +42,8 @@ public class MoviesProvider extends ContentProvider {
         uriMatcher.addURI(MoviesContract.AUTHORITY, MoviesContract.PATH_REVIEWS + "/#", REVIEW_WITH_ID);
         uriMatcher.addURI(MoviesContract.AUTHORITY, MoviesContract.PATH_TRAILERS, TRAILERS);
         uriMatcher.addURI(MoviesContract.AUTHORITY, MoviesContract.PATH_TRAILERS + "/#", TRAILER_WITH_ID);
+        uriMatcher.addURI(MoviesContract.AUTHORITY, MoviesContract.PATH_FAVORITE, FAVORITES);
+        uriMatcher.addURI(MoviesContract.AUTHORITY, MoviesContract.PATH_FAVORITE + "/#", FAVORITE_WITH_ID);
 
         return uriMatcher;
     }
@@ -56,6 +63,24 @@ public class MoviesProvider extends ContentProvider {
         Cursor cursor = null;
         String table = null;
         switch (match){
+            case FAVORITES: {
+                SQLiteQueryBuilder sqLiteQueryBuilder = new SQLiteQueryBuilder();
+                sqLiteQueryBuilder.setTables(MoviesContract.MoviesEntry.TABLE_NAME + " INNER JOIN " +
+                        MoviesContract.FavoriteEntry.TABLE_NAME + " ON " +
+                        MoviesContract.MoviesEntry.TABLE_NAME+"."+ MoviesContract.MoviesEntry._ID +
+                        " = " + MoviesContract.FavoriteEntry.TABLE_NAME+"."+ MoviesContract.FavoriteEntry._ID);
+
+                cursor = sqLiteQueryBuilder.query(sqLiteDatabase,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder);
+                cursor.setNotificationUri(getContext().getContentResolver(), uri);
+                return cursor;
+
+            }
             case MOVIES: {
                 table = MoviesContract.MoviesEntry.TABLE_NAME;
             }break;
@@ -64,6 +89,9 @@ public class MoviesProvider extends ContentProvider {
             }break;
             case TRAILERS: {
                 table = MoviesContract.TrailersEntry.TABLE_NAME;
+            }break;
+            case FAVORITE_WITH_ID: {
+                table = MoviesContract.FavoriteEntry.TABLE_NAME;
             }break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
@@ -96,23 +124,31 @@ public class MoviesProvider extends ContentProvider {
         switch (match){
             case MOVIES: {
                 id = sqLiteDatabase.insertWithOnConflict(MoviesContract.MoviesEntry.TABLE_NAME, null,
-                        values, SQLiteDatabase.CONFLICT_IGNORE);
+                        values, SQLiteDatabase.CONFLICT_REPLACE);
                 if (id > 0) {
                     returnUri = ContentUris.withAppendedId(MoviesContract.MoviesEntry.CONTENT_URI, id);
                 }
             }break;
             case REVIEWS: {
                 id = sqLiteDatabase.insertWithOnConflict(MoviesContract.ReviewsEntry.TABLE_NAME, null,
-                        values, SQLiteDatabase.CONFLICT_IGNORE);
+                        values, SQLiteDatabase.CONFLICT_REPLACE);
                 if (id > 0) {
                     returnUri = ContentUris.withAppendedId(MoviesContract.ReviewsEntry.CONTENT_URI, id);
                 }
             }break;
             case TRAILERS: {
                 id = sqLiteDatabase.insertWithOnConflict(MoviesContract.TrailersEntry.TABLE_NAME, null,
-                        values, SQLiteDatabase.CONFLICT_IGNORE);
+                        values, SQLiteDatabase.CONFLICT_REPLACE);
                 if (id > 0) {
                     returnUri = ContentUris.withAppendedId(MoviesContract.TrailersEntry.CONTENT_URI, id);
+                }
+
+            }break;
+            case FAVORITE_WITH_ID: {
+                id = sqLiteDatabase.insertWithOnConflict(MoviesContract.FavoriteEntry.TABLE_NAME, null,
+                        values, SQLiteDatabase.CONFLICT_REPLACE);
+                if (id > 0) {
+                    returnUri = ContentUris.withAppendedId(MoviesContract.FavoriteEntry.CONTENT_URI, id);
                 }
 
             }break;
@@ -152,6 +188,12 @@ public class MoviesProvider extends ContentProvider {
             }break;
             case TRAILERS: {
                 rows = sqLiteDatabase.updateWithOnConflict(MoviesContract.TrailersEntry.TABLE_NAME, values,
+                        selection,
+                        selectionArgs,
+                        SQLiteDatabase.CONFLICT_REPLACE);
+            }break;
+            case FAVORITE_WITH_ID: {
+                rows = sqLiteDatabase.updateWithOnConflict(MoviesContract.FavoriteEntry.TABLE_NAME, values,
                         selection,
                         selectionArgs,
                         SQLiteDatabase.CONFLICT_REPLACE);

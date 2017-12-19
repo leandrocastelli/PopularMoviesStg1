@@ -46,5 +46,20 @@
             android:layout_marginEnd="16dp"
             android:layout_marginStart="16dp"/>
 
+        <android.support.v7.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:id="@+id/rv_trailers_list"
+            android:layout_below="@id/tv_detail_description"
+
+            />
+        <android.support.v7.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/rv_review_list"
+            android:layout_below="@id/rv_trailers_list"
+
+            />
+
     </RelativeLayout>
 </ScrollView>

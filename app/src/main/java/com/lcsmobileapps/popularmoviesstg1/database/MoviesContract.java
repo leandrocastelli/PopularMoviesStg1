@@ -15,6 +15,7 @@ public class MoviesContract {
     public static final String PATH_MOVIES = "movies";
     public static final String PATH_TRAILERS = "trailers";
     public static final String PATH_REVIEWS = "reviews";
+    public static final String PATH_FAVORITE = "favorites";
 
     public static final class MoviesEntry implements BaseColumns {
 
@@ -27,7 +28,6 @@ public class MoviesContract {
         public static final String COLUMN_OVERVIEW = "movie_overview";
         public static final String COLUMN_VOTE = "movie_vote";
         public static final String COLUMN_RELEASE = "movie_release";
-        public static final String COLUMN_FAVORITE = "movie_favorite";
     }
 
     public static final class ReviewsEntry implements BaseColumns {
@@ -47,5 +47,11 @@ public class MoviesContract {
         public static final String COLUMN_KEY = "trailers_key";
         public static final String COLUMN_NAME = "trailers_name";
         public static final String COLUMN_MOVIE_ID = "review_movie_id";
+    }
+    public static final class FavoriteEntry implements BaseColumns{
+        public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_FAVORITE)
+                .build();
+        public static final String TABLE_NAME = "favorites";
+        public static final String COLUMN_FAVORITE = "movie_favorite";
     }
 }

@@ -110,7 +110,6 @@ public class Movie {
         contentValues.put(MoviesEntry.COLUMN_OVERVIEW, overview);
         contentValues.put(MoviesEntry.COLUMN_VOTE, vote_average);
         contentValues.put(MoviesEntry.COLUMN_RELEASE, release_date);
-        contentValues.put(MoviesEntry.COLUMN_FAVORITE, favorite);
         return contentValues;
     }
 
@@ -122,7 +121,6 @@ public class Movie {
         int overviewIndex = cursor.getColumnIndex(MoviesEntry.COLUMN_OVERVIEW);
         int voteIndex = cursor.getColumnIndex(MoviesEntry.COLUMN_VOTE);
         int releaseIndex = cursor.getColumnIndex(MoviesEntry.COLUMN_RELEASE);
-        int favoriteIndex = cursor.getColumnIndex(MoviesEntry.COLUMN_FAVORITE);
 
         this.id = String.valueOf(cursor.getInt(idIndex));
         this.original_title = cursor.getString(titleIndex);
@@ -131,7 +129,6 @@ public class Movie {
         this.overview = cursor.getString(overviewIndex);
         this.vote_average = String.valueOf(cursor.getFloat(voteIndex));
         this.release_date = cursor.getString(releaseIndex);
-        this.favorite = cursor.getInt(favoriteIndex);
     }
 
 }
