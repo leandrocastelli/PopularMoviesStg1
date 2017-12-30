@@ -16,6 +16,8 @@ public class Constants {
     public static final String MOVIE_PREFERENCE = "movies";
     public static final String KEY_DATASET = "dataset";
     public static final String EXTRA_MOVIE = "movie";
+    public static final String EXTRA_STATE = "state";
+    public static final String EXTRA_POSITION = "position";
     public static final String URL_YOUTUBE = "http://www.youtube.com/watch?v=";
 
 }

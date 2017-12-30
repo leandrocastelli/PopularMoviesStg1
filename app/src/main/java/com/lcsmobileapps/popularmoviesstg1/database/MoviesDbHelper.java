@@ -14,7 +14,7 @@ import com.lcsmobileapps.popularmoviesstg1.database.MoviesContract.TrailersEntry
 public class MoviesDbHelper extends SQLiteOpenHelper {
     public static final String DATABASE_NAME = "movies.db";
 
-    private static final int VERSION = 2;
+    private static final int VERSION = 1;
     public MoviesDbHelper(Context context) {
         super(context, DATABASE_NAME, null, 1);
     }
@@ -54,10 +54,6 @@ public class MoviesDbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS " + MoviesEntry.TABLE_NAME);
-        db.execSQL("DROP TABLE IF EXISTS " + ReviewsEntry.TABLE_NAME);
-        db.execSQL("DROP TABLE IF EXISTS " + TrailersEntry.TABLE_NAME);
-        db.execSQL("DROP TABLE IF EXISTS " + MoviesContract.FavoriteEntry.TABLE_NAME);
         onCreate(db);
     }
 }

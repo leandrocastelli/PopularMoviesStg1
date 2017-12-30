@@ -1,6 +1,7 @@
 package com.lcsmobileapps.popularmoviesstg1;
 
 import android.content.DialogInterface;
+import android.os.Handler;
 import android.support.v4.content.Loader;
 import android.content.res.Configuration;
 import android.database.Cursor;
@@ -12,6 +13,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.GridLayout;
 import android.widget.ProgressBar;
 
 import com.lcsmobileapps.popularmoviesstg1.adapter.MoviesAdapter;
@@ -28,12 +30,17 @@ import java.util.List;
 
 import static com.lcsmobileapps.popularmoviesstg1.net.MoviesLoader.LOAD_CATEGORY;
 import static com.lcsmobileapps.popularmoviesstg1.net.MoviesLoader.MOVIES_LOADER_ID;
+import static com.lcsmobileapps.popularmoviesstg1.utils.Constants.EXTRA_POSITION;
+import static com.lcsmobileapps.popularmoviesstg1.utils.Constants.EXTRA_STATE;
 
 
 public class MainActivity extends AppCompatActivity {
 
     private RecyclerView rv;
     private ProgressBar progressBar;
+    GridLayoutManager.SavedState mSavedState;
+    private int last_position = -1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,11 +55,32 @@ public class MainActivity extends AppCompatActivity {
         }
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, columnsNumber);
 
-        rv.setLayoutManager(gridLayoutManager);
         MoviesAdapter adapter = new MoviesAdapter();
         rv.setAdapter(adapter);
         updateAdapter();
+        rv.setLayoutManager(gridLayoutManager);
+        if (savedInstanceState != null ){
+            mSavedState = savedInstanceState.getParcelable(EXTRA_STATE);
+            last_position = savedInstanceState.getInt(EXTRA_POSITION);
+        }
+
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (last_position == -1)
+            return;
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                rv.getLayoutManager().onRestoreInstanceState(mSavedState);
+                rv.getLayoutManager().scrollToPosition(last_position);
+                rv.scrollToPosition(last_position);
+            }
+        }, 200);
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -60,6 +88,7 @@ public class MainActivity extends AppCompatActivity {
         inflater.inflate(R.menu.main_activity, menu);
         return true;
     }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -116,6 +145,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+        GridLayoutManager gridLayoutManager = (GridLayoutManager) rv.getLayoutManager();
+
+        outState.putParcelable(EXTRA_STATE, gridLayoutManager.onSaveInstanceState());
+        outState.putInt(EXTRA_POSITION, gridLayoutManager.findFirstVisibleItemPosition());
 
     }
 
